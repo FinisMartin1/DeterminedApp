@@ -1,0 +1,16 @@
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+    <div{% if message.tags %} class="alert alert-sm alert-{{ message.tags }}"{% endif %}>
+        {{ message }}
+    </div>
+    {% endfor %}
+    <script>
+        var message_ele = document.getElementsByClassName("messages")[0];
+
+        setTimeout(function(){ 
+        message_ele.style.display = "none"; 
+        }, 4000);
+    </script>
+</div>
+{% endif %}

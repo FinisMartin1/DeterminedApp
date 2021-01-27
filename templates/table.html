@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Table - Determined</title>
+    <meta name="description" content="A Web Application for Analysis of Student Outcomes">
+    <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
+</head>
+
+<body id="page-top">
+    <div id="wrapper">
+        {% include '_sidebar.html' %}
+        <div class="d-flex flex-column" id="content-wrapper">
+            <div id="content">
+            {% include '_topbar.html' %}
+            <div class="container-fluid">
+                <div class="card shadow">
+                    <div class="card-header py-3">
+                        <h3 class="text-primary m-0 font-weight-bold">Users</3>
+                    </div>
+                    <div class="card-body">
+                        <form method="post",>
+                            <div class="table-responsive table mt-2" id="dataTable" role="grid" aria-describedby="dataTable_info">
+                                <table class="table my-0" id="dataTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Access Level</th>
+                                            <th>Email Address</th>
+                                            <th>Approve</th>
+                                            <th>Deny</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for user in users %}
+                                            {% if not user.is_active %}
+                                                <tr class="student">
+                                                    <td>{{user.name}}</td>
+                                                    <td>{{user.access_level}}</td>
+                                                    <td>{{user.email}}</td>
+                                                    <input type="hidden" name="email[{{ forloop.counter0 }}]" value={{ user.email }}/>
+                                                </tr>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% csrf_token %}
+                        <input type="submit" value="Submit">
+                    </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <footer class="bg-white sticky-footer">
+            <div class="container my-auto">
+                <div class="text-center my-auto copyright"><span>Copyright © Determined 2020</span></div>
+            </div>
+        </footer>
+    </div><a onclick="window.scrollTo(0,document.body.scrollHeight);" class="border rounded d-inline scroll-to-top" href="#page-bottom"><i class="fas fa-angle-down"></i></a></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
+    <script src="/assets/js/bs-init.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.js"></script>
+    <script src="/assets/js/theme.js"></script>
+    <script>
+        var x,i;
+    
+        x= document.querySelectorAll(".student");
+        for(i=0;i<x.length;i++)
+        {
+            x[i].innerHTML+="<td><input type='radio' id='approve' name='approval["+(i+1)+"]'value='1'></td>";
+        }
+        for(i=0;i<x.length;i++)
+        {
+            x[i].innerHTML+="<td><input type='radio' id='deny' name='approval["+(i+1)+"]'value='0'></td>";
+        }
+    </script>
+</body>
+
+</html>

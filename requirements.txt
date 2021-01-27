@@ -1,0 +1,4 @@
+names==0.3.0
+Django==3.0.3
+passlib==1.7.4
+gunicorn==20.0.4

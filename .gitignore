@@ -1,0 +1,3 @@
+*.pyc
+users/migrations
+.vscode/

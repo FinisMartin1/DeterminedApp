@@ -1,0 +1,23 @@
+                <nav class="navbar navbar-light navbar-expand bg-white shadow mb-4 topbar static-top">
+                    <div class="container-fluid">
+                        <div class="sidebar-brand-text mx-3"> <a href="../dashboard/">DCIA - Department Continuous
+                                Improvement Application</a></div>
+                        {% include '_messages.html' %}
+                        <ul class="nav navbar-nav flex-nowrap ml-auto">
+                            <div class="d-none d-sm-block topbar-divider"></div>
+                            <li class="nav-item dropdown no-arrow">
+                                <div class="nav-item dropdown no-arrow"><a data-toggle="dropdown" aria-expanded="false"
+                                        class="dropdown-toggle nav-link" href="#"><span
+                                            class="d-none d-lg-inline mr-2 text-gray-600 small">{{ username }}</span></a>
+                                    <div class="dropdown-menu shadow dropdown-menu-right animated--grow-in"><a
+                                            class="dropdown-item" href="../profile"><i
+                                                class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i> Profile</a>
+                                            <div class="dropdown-divider"></div><a class="dropdown-item"
+                                                href="../logout"><i
+                                                    class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i> Logout</a>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>

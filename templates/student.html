@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Student Work Project - Determined</title>
+    <meta name="description" content="A Web Application for Analysis of Student Outcomes">
+    <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/bootstrap/css/custom.css">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
+</head>
+
+<body id="page-top">
+    <div id="wrapper">
+        {% include '_sidebar.html' %}
+        <div class="d-flex flex-column" id="content-wrapper">
+            <div id="content">
+                {% include '_topbar.html' %}
+                <div class="container-fluid">
+                    <div class="card shadow">
+                        <div class="card-header py-3">
+                            <h3 class="text-primary m-0 font-weight-bold">Student Work Product</3>
+                        </div>
+                        <div class="card-body">
+                            <div>
+                                <form>
+                                    <div class="form-row">
+                                        <div class="col">
+                                            <div class="dropdown"><button class="btn btn-primary dropdown-toggle"
+                                                    data-toggle="dropdown" aria-expanded="false" type="button"
+                                                    display="flex"
+                                                    justify-content="center">{{ drop_title.dept }}</button>
+                                                <div class="dropdown-menu">
+                                                    <a class="dropdown-item"
+                                                        href="?dept=All&course={{ drop_title.course }}&term={{ drop_title.term }}&swp={{ drop_title.swp }}">All</a>
+                                                    {% for dept in dropdown.dept_ids %}
+                                                    <a class="dropdown-item"
+                                                        href="?dept={{ dept }}&course={{ drop_title.course }}&term={{ drop_title.term }}&swp={{ drop_title.swp }}">{{ dept }}</a>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col">
+                                            <div class="dropdown"><button class="btn btn-primary dropdown-toggle"
+                                                    data-toggle="dropdown" aria-expanded="false"
+                                                    type="button">{{ drop_title.course }}
+                                                </button>
+                                                <div class="dropdown-menu">
+                                                    <a class="dropdown-item"
+                                                        href="?dept={{ drop_title.dept }}&course=All&term={{ drop_title.term }}&swp={{ drop_title.swp }}">All</a>
+                                                    {% for course in dropdown.courses %}
+                                                    <a class="dropdown-item"
+                                                        href="?dept={{ drop_title.dept }}&course={{ course }}&term={{ drop_title.term }}&swp={{ drop_title.swp }}">{{ course }}</a>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col">
+                                            <div class="dropdown"><button class="btn btn-primary dropdown-toggle"
+                                                    data-toggle="dropdown" aria-expanded="false"
+                                                    type="button">{{ drop_title.term }}
+                                                </button>
+                                                <div class="dropdown-menu">
+                                                    <a class="dropdown-item"
+                                                        href="?dept={{ drop_title.dept }}&course={{ drop_title.course }}&term=All&swp={{ drop_title.swp }}">All</a>
+                                                    {% for term in dropdown.terms %}
+                                                    <a class="dropdown-item"
+                                                        href="?dept={{ drop_title.dept }}&course={{ drop_title.course }}&term={{ term }}&swp={{ drop_title.swp }}">{{ term }}</a>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col">
+                                            <div class="dropdown"><button class="btn btn-primary dropdown-toggle"
+                                                    data-toggle="dropdown" aria-expanded="false"
+                                                    type="button">{{ drop_title.swp }}
+                                                </button>
+                                                <div class="dropdown-menu"><a class="dropdown-item"
+                                                        href="?dept={{ drop_title.dept }}&course={{ drop_title.course }}&term={{ drop_title.term }}&swp=All">All</a>
+                                                    {% for swp in dropdown.swp %}
+                                                    <a class="dropdown-item"
+                                                        href="?dept={{ drop_title.dept }}&course={{ drop_title.course }}&term={{ drop_title.term }}&swp={{ swp }}">{{ swp }}</a>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <form method="post">
+                                {% csrf_token %}
+                                <div class="table-responsive table mt-2" id="dataTable" role="grid"
+                                    aria-describedby="dataTable_info">
+                                    <table class="table my-0" id="student_work_product_table">
+                                        <thead>
+                                            <tr>
+                                                <th>Product</th>
+                                                <th>Course Id</th>
+                                                <th>Dept Id</th>
+                                                <th>Student First Name</th>
+                                                <th>Student Last Name</th>
+                                                <th>Student Outcome</th>
+                                                <th>Score</th>
+                                                <th>Term</th>
+                                                <th>Year</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for student in table_data %}
+                                            <tr class="course">
+                                                <td style="display:none;"><input value={{student.id}} name="RowId"
+                                                        style="display:none;">
+                                                <td><textarea cols="8" rows="1" name="Product"
+                                                        required>{{student.product}}</textarea></td>
+                                                <td><input value={{student.course_id}} name="CourseId" class="courses"
+                                                        style="width:45px" min="1000" max="9999" type="number"
+                                                        required /></td>
+                                                <td><input value={{student.dept_id}} name="DeptId" class="courses"
+                                                        style="width:60px" required pattern="[A-Za-z]{4}" maxlength="4"
+                                                        oninvalid="this.setCustomValidity('Must be 4 characters')"
+                                                        onchange="this.setCustomValidity('')" />
+                                                </td>
+                                                <td><input value={{student.student_fname}} name="Fname" ,
+                                                        class="courses" style="width:80px" required pattern="[A-Za-z]+"
+                                                        maxlength="35"
+                                                        oninvalid="this.setCustomValidity('Names can only be made of characters')"
+                                                        onchange="this.setCustomValidity('')" />
+                                                </td>
+                                                <td><input value={{student.student_lname}} name="Lname" ,
+                                                        class="courses" style="width:80px" required pattern="[A-Za-z]+"
+                                                        maxlength="35"
+                                                        oninvalid="this.setCustomValidity('Names can only be made of characters')"
+                                                        onchange="this.setCustomValidity('')" />
+                                                </td>
+                                                <td><input value={{student.student_outcome}} name="Outcome"
+                                                        class="courses" style="width:45px" min="0" max="4" type="number"
+                                                        required /></td>
+                                                <td><input value={{student.score}} name="Score" class="courses"
+                                                        style="width:45px" min="0" max="100" type="number" required />
+                                                </td>
+                                                <td><input value={{student.term}} name="Term" , class="courses"
+                                                        style="width:65px" required maxlength="6"
+                                                        pattern="[sS][pP][rR][iI][nN][gG]|[sS][uU][mM][mM][eE][rR]|[fF][aA][lL][lL]"
+                                                        oninvalid="this.setCustomValidity('Please use Fall, Spring, or Summer')"
+                                                        onchange="this.setCustomValidity('')" />
+                                                </td>
+                                                <td><input value={{student.year}} name="Year" , class="courses"
+                                                        style="width:45px" required min="1000" max="9999"
+                                                        type="number" /></td>
+                                                <td><button type="Button"
+                                                        onclick="deleterow('student_work_product_table', this)"
+                                                        class="btn btn-outline-danger btn-sm"
+                                                        style="border:none;">X</button></td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                    {% comment %} Create new row {% endcomment %}
+                                    <button type="Button" class="btn btn-outline-secondary btn-sm"
+                                        onclick="createSwpRow('student_work_product_table', '{{drop_title.swp}}', '{{drop_title.course}}', '{{drop_title.dept}}', '{{drop_title.term}}')" style="float: right;">Add
+                                        Student</button>
+                                    {% if not student_sync %}
+                                        <a type="Button" class="btn btn-outline-primary btn-sm"
+                                            onclick="return confirm('You are about to sync all students of the course. This will ensure each student has a record for ALL student work products. Are you use you wish to continue?')" href="?dept={{ drop_title.dept }}&course={{ drop_title.course }}&term={{ drop_title.term }}&swp={{ drop_title.swp }}&sync=true"
+                                            style="float: right;">Sync 
+                                            Students</a>
+                                    {%endif%}
+                                </div>
+
+                                <input type="submit" value="Submit"
+                                    onclick="return confirm('You are about to Modify/Delete/Create Student rows. Are you sure you want to continue?')">
+                            </form>
+
+
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <footer class="bg-white sticky-footer">
+                <div class="container my-auto">
+                    <div class="text-center my-auto copyright"><span>Copyright © Determined 2020</span></div>
+                </div>
+            </footer>
+        </div><a onclick="window.scrollTo(0,document.body.scrollHeight);" class="border rounded d-inline scroll-to-top"
+            href="#page-bottom"><i class="fas fa-angle-down"></i></a></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/js/bootstrap.bundle.min.js">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
+    <script src="/assets/js/bs-init.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.js"></script>
+    <script src="/assets/js/theme.js"></script>
+    <script src="/assets/js/tables.js"></script>
+</body>
+
+</html>

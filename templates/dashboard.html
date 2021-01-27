@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Dashboard - Determined</title>
+    <meta name="description" content="A Web Application for Analysis of Student Outcomes">
+    <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
+</head>
+
+<body id="page-top">
+    <div id="wrapper">
+        {% include '_sidebar.html' %}
+        <div class="d-flex flex-column" id="content-wrapper">
+            <div id="content">
+                {% include '_topbar.html' %}
+                <div class="container-fluid">
+                    <div class="d-sm-flex justify-content-between align-items-center mb-4">
+                        <h3 class="text-dark mb-0">Dashboard</h3>
+                        {% if view == "course"%}
+                        <a type="button" href="?view=instructor" class="btn btn-outline-primary"
+                            style="float: right; font-size:18px">Instructor View</a>
+                        {% else %}
+                        <a type="button" href="?view=course" class="btn btn-outline-primary"
+                            style="float: right; font-size:18px">Course View</a>
+                        {% endif %}
+                    </div>
+                    <div class="col-lg-7 col-xl-8" style="max-width: 100%;">
+                        <div class="card shadow mb-4">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h6 class="text-primary font-weight-bold m-0">University Student Work Progress</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-area">
+                                    <canvas id="university_swp" data-bs-chart="{{ university_swp|escape }}"></canvas>
+                                    <script>
+                                        function update_chart() {
+                                            var chart = document.querySelector('canvas').chart;
+                                            chart.options.onClick = function (e, elements) {
+                                                if (elements.length != 0) {
+                                                    var chart = elements[0]._chart;
+                                                    var dataset = chart.data.datasets;
+                                                    for (i = 0; i < dataset.length; i++) {
+                                                        // not clicked on
+                                                        if (chart.getElementAtEvent(e)[0]._datasetIndex != i) {
+                                                            //reset hidden elements
+                                                            if (dataset[i].borderColor.length > 7) {
+                                                                dataset[i].borderColor = dataset[i].borderColor
+                                                                    .slice(0,
+                                                                        -2)
+                                                            }
+                                                            //Hidding elements
+                                                            else {
+                                                                dataset[i].borderColor = dataset[i].borderColor
+                                                                    .concat(
+                                                                        '30');
+                                                            }
+                                                        }
+                                                        //clicked on
+                                                        else {
+
+                                                            //Reset clicked on
+                                                            if (dataset[i].backgroundColor.length > 7) {
+                                                                dataset[i].fill = false
+                                                                dataset[i].backgroundColor = dataset[i].borderColor
+                                                                    .slice(0,
+                                                                        -2)
+                                                            }
+                                                            //Activate element
+                                                            else {
+                                                                dataset[i].fill = true
+                                                                dataset[i].backgroundColor = dataset[i].borderColor
+                                                                    .concat(
+                                                                        '60');
+                                                            }
+                                                        }
+                                                    }
+                                                    chart.update()
+                                                }
+                                            }
+                                        }
+                                        window.onload = function () {
+                                            update_chart()
+                                        }
+                                    </script>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="dropdown">
+                                <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"
+                                    aria-expanded="false" type="button">{{ select }}</button>
+                                <div class="dropdown-menu">
+                                    {% if view == "course"%}
+                                    {% for item in courses%}
+                                    <a class="dropdown-item" href="?view=course&id={{ item.id }}">{{ item.name }}</a>
+                                    {% endfor %}
+                                    {%else%}
+                                    {% for item in courses%}
+                                    <a class="dropdown-item"
+                                        href="?view=instructor&id={{ item.name }}">{{ item.name }}</a>
+                                    {% endfor %}
+                                    {%endif%}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                        {% if select != "Select Instructor" and select != "Select Course" %}
+                            <div class="dropdown">
+                            {% if view == "course"%}
+                            <button class="btn btn-outline-secondary dropdown-toggle" data-toggle="dropdown"
+                                    aria-expanded="false" type="button" style="float: right;">Course Instructors</button>
+                                <div class="dropdown-menu">
+                                {% for name in course_instructors%}
+                                    <a class="dropdown-item" id="dif" 
+                                       href="?view=instructor&id={{ name }}">{{ name }}</a>
+                                {%endfor%}
+                                </div>
+                            {%else%}
+                                <button class="btn btn-outline-secondary dropdown-toggle" data-toggle="dropdown"
+                                    aria-expanded="false" type="button" style="float: right;">Courses Taught</button>
+                                <div class="dropdown-menu">
+                                {% for item in instructor_courses%}
+                                    <a class="dropdown-item" id="dif" 
+                                        href="?view=course&id={{ item.id }}">{{ item.name }}</a>
+                                {%endfor%}
+                                </div>
+                            {%endif%}
+                            </div>
+                        {%endif%}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-7 col-xl-8" style="max-width: 50%;">
+                            <div class="card shadow mb-4">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    {%if view == "course"%}
+                                    <h6 class="text-primary font-weight-bold m-0">Course Student Work Product</h6>
+                                    {%else%}
+                                    <h6 class="text-primary font-weight-bold m-0">Instructor Student Work Product
+                                    </h6>
+                                    {%endif%}
+                                </div>
+                                <div class="card-body">
+                                    <div class="chart-area"><canvas data-bs-chart="{{ course_swp|escape }}"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-5 col-xl-4" style="max-width: 50%;min-width: 50%;">
+                            <div class="card shadow mb-4">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h6 class="text-primary font-weight-bold m-0">Student Pass/Fail</h6>
+                                </div>
+                                <div class="card-body" style="height: 360px;">
+                                    <div class="chart-area"><canvas
+                                            data-bs-chart="{{ course_pass_fail|escape }}"></canvas></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-7 col-xl-8" style="max-width: 50%;">
+                            <div class="card shadow mb-4">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    {%if view == "course"%}
+                                    <h6 class="text-primary font-weight-bold m-0">Course Student Work Product Count
+                                    </h6>
+                                    {%else%}
+                                    <h6 class="text-primary font-weight-bold m-0">Instructor Student Work Product
+                                        Count
+                                    </h6>
+                                    {%endif%}
+                                </div>
+                                <div class="card-body">
+                                    <div class="chart-area"><canvas
+                                            data-bs-chart="{{ course_swp_count|escape }}"></canvas></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-5 col-xl-4" style="max-width: 50%;min-width: 50%;">
+                            <div class="card shadow mb-4">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    {%if view == "course"%}
+                                    <h6 class="text-primary font-weight-bold m-0">Course Student Work Product Trend
+                                    </h6>
+                                    {%else%}
+                                    <h6 class="text-primary font-weight-bold m-0">Instructor Student Work Product
+                                        Trend
+                                    </h6>
+                                    {%endif%}
+                                </div>
+                                <div class="card-body" style="height: 360px;">
+                                    <div class="chart-area"><canvas data-bs-chart="{{ course_grade|escape }}"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <footer class="bg-white sticky-footer">
+                <div class="container my-auto">
+                    <div class="text-center my-auto copyright"><span>Copyright © Determined 2020</span></div>
+                </div>
+            </footer>
+        </div><a class="border rounded d-inline scroll-to-top" href="#page-top"><i class="fas fa-angle-up"></i></a>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/js/bootstrap.bundle.min.js">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
+    <script src="/assets/js/bs-init.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.js"></script>
+    <script src="/assets/js/theme.js"></script>
+</body>
+
+</html>

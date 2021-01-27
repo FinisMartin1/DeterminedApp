@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Table - Determined</title>
+    <meta name="description" content="A Web Application for Analysis of Student Outcomes">
+    <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/bootstrap/css/custom.css">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
+</head>
+
+<body id="page-top">
+    <div id="wrapper">
+        {% include '_sidebar.html' %}
+        <div class="d-flex flex-column" id="content-wrapper">
+            <div id="content">
+                {% include '_topbar.html' %}
+                <div class="container-fluid">
+                    <div class="card shadow" >
+                        <div class="card-header py-3">
+                        {% comment %} Title {% endcomment %}
+                            {%if modify %}
+                            <h3 class="text-primary m-0 font-weight-bold" style="margin-top:-20px ;">Modify Course</3>
+                                <a type="button" href="./" class="btn btn-outline-primary"
+                                    style="float: right; font-size:18px">Create</a>
+                                {%else%}
+                                <h3 class="text-primary m-0 font-weight-bold" style="margin-top:-20px ;">Create Course
+                                    </3>
+                                    <a type="button" href="?modify" class="btn btn-outline-primary"
+                                        style="float: right; font-size:18px">Modify</a>
+                                    {%endif%}
+                        </div>
+                        {% comment %} Modify button selection {% endcomment %}
+                        <div class="card-body">
+                            {%if modify %}
+                            <button class="btn btn-info dropdown-toggle" style="float: right;" data-toggle="dropdown"
+                                aria-expanded="false" type="button">{{ term_text }}</button>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" href="?modify&term=All">All</a>
+                                {% for term in terms %}
+                                <a class="dropdown-item" href="?modify&term={{ term }}">{{ term }}</a>
+                                {% endfor %}
+                            </div>
+                            {%endif%}
+                            <form method="post">
+                                {% csrf_token %}
+                                <div class="table-responsive table mt-2" id="dataTable" role="grid"
+                                    aria-describedby="dataTable_info">
+                                    <table class="table my-0" id="courseDataTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Course Number</th>
+                                                <th>Department Id</th>
+                                                <th>Title</th>
+                                                <th>Instuctor First Name</th>
+                                                <th>Instuctor Last Name</th>
+                                                <th>Student Work Products <em>(comma seperated)</em></th>
+                                                <th>Term</th>
+                                                <th>Year</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% comment %} New Courses {% endcomment %}
+                                            {% if not modify %}
+                                            <tr class="course">
+                                                <td><input placeholder="New" name="CourseNum" class="courses"
+                                                        style="width:45px" min="1000" max="9999" type="number"
+                                                        required /></td>
+                                                <td><input placeholder="New" name="DeptId" class="courses"
+                                                        style="width:60px" required pattern="[A-Za-z]{4}" maxlength="4"
+                                                        oninvalid="this.setCustomValidity('Must be 4 characters')"
+                                                        onchange="this.setCustomValidity('')" />
+                                                </td>
+                                                <td><textarea placeholder="New" name="Title" cols="18" rows="2"
+                                                        maxlength="100" required></textarea></td>
+                                                <td><input placeholder="New" name="Fname" class="courses"
+                                                        style="width:80px" required pattern="[A-Za-z]+" maxlength="35"
+                                                        oninvalid="this.setCustomValidity('Names can only be made of characters')"
+                                                        onchange="this.setCustomValidity('')" />
+                                                </td>
+                                                <td><input placeholder="New" name="Lname" class="courses"
+                                                        style="width:80px" required pattern="[A-Za-z]+" maxlength="35"
+                                                        oninvalid="this.setCustomValidity('Names can only be made of characters')"
+                                                        onchange="this.setCustomValidity('')" />
+                                                </td>
+                                                <td><textarea placeholder="New" name="SWP" cols="18" rows="2"
+                                                        required></textarea></td>
+                                                <td><input placeholder="New" name="Term" class="courses"
+                                                        style="width:65px" required maxlength="6"
+                                                        pattern="[sS][pP][rR][iI][nN][gG]|[sS][uU][mM][mM][eE][rR]|[fF][aA][lL][lL]"
+                                                        oninvalid="this.setCustomValidity('Please use Fall, Spring, or Summer')"
+                                                        onchange="this.setCustomValidity('')" />
+                                                </td>
+                                                <td><input placeholder="New" name="Year" class="courses"
+                                                        style="width:45px" required min="1000" max="9999"
+                                                        type="number" /></td>
+                                                <td><button type="Button" onclick="deleterow('courseDataTable', this)"
+                                                        class="btn btn-outline-danger btn-sm"
+                                                        style="border:none;">X</button>
+                                            </tr>
+                                            {% else %}
+                                            {% comment %} Modifing Courses {% endcomment %}
+                                            {% for course in courses %}
+                                            <tr class="course">
+                                                <td><input value={{course.course_number}} name="CourseNum"
+                                                        class="courses" style="width:45px" min="1000" max="9999"
+                                                        type="number" required /></td>
+                                                <td><input value={{course.dept_id}} name="DeptId" class="courses"
+                                                        style="width:60px" required pattern="[A-Za-z]{4}" maxlength="4"
+                                                        oninvalid="this.setCustomValidity('Must be 4 characters')"
+                                                        onchange="this.setCustomValidity('')" />
+                                                </td>
+                                                <td><textarea name="Title" cols="18" rows="2"
+                                                        required>{{course.title}}</textarea></td>
+                                                <td><input value={{course.instructor_fname}} name="Fname" ,
+                                                        class="courses" style="width:80px" required pattern="[A-Za-z]+"
+                                                        maxlength="35"
+                                                        oninvalid="this.setCustomValidity('Names can only be made of characters')"
+                                                        onchange="this.setCustomValidity('')" />
+                                                </td>
+                                                <td><input value={{course.instructor_lname}} name="Lname" ,
+                                                        class="courses" style="width:80px" required pattern="[A-Za-z]+"
+                                                        maxlength="35"
+                                                        oninvalid="this.setCustomValidity('Names can only be made of characters')"
+                                                        onchange="this.setCustomValidity('')" />
+                                                </td>
+                                                <td><textarea name="SWP" cols="18" rows="2"
+                                                        required>{{course.swp}}</textarea>
+                                                </td>
+                                                <td><input value={{course.term}} name="Term" , class="courses"
+                                                        style="width:65px" required maxlength="6"
+                                                        pattern="[sS][pP][rR][iI][nN][gG]|[sS][uU][mM][mM][eE][rR]|[fF][aA][lL][lL]"
+                                                        oninvalid="this.setCustomValidity('Please use Fall, Spring, or Summer')"
+                                                        onchange="this.setCustomValidity('')" />
+                                                </td>
+                                                <td><input value={{course.year}} name="Year" , class="courses"
+                                                        style="width:45px" required min="1000" max="9999"
+                                                        type="number" /></td>
+                                                <td><button type="Button" onclick="deleterow('courseDataTable', this)"
+                                                        class="btn btn-outline-danger btn-sm"
+                                                        style="border:none;">X</button>
+                                            </tr>
+                                            {% endfor %}
+                                            {% endif %}
+                                        </tbody>
+                                    </table>
+                                    {% comment %} Create new row {% endcomment %}
+                                    {% if not modify %}
+                                    <button type="Button" class="btn btn-outline-secondary btn-sm"
+                                        onclick="createRow('courseDataTable')" style="float: right;">Add Row</button>
+                                    {% endif %}
+                                </div>
+                                {% comment %} Submit {% endcomment %}
+                                <button type="submit" class="btn btn-secondary"
+                                    onclick="return confirm('Modifing/Deleting a course will modify/delete the students of that course. Are you sure you want to continue?')">Submit</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <footer class="bg-white sticky-footer">
+                <div class="container my-auto">
+                    <div class="text-center my-auto copyright"><span>Copyright © Determined 2020</span></div>
+                </div>
+            </footer>
+            </div><a onclick="window.scrollTo(0,document.body.scrollHeight);" class="border rounded d-inline scroll-to-top" href="#page-bottom"><i class="fas fa-angle-down"></i></a></div>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/js/bootstrap.bundle.min.js">
+            </script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
+            <script src="/assets/js/bs-init.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.js"></script>
+            <script src="/assets/js/theme.js"></script>
+            <script src="/assets/js/tables.js"></script>
+
+</body>
+
+</html>
